@@ -1,0 +1,223 @@
+-- Painel de Admin com Pulo, Velocidade e Voo Controlado
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+local playerGui = player:WaitForChild("PlayerGui")
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
+
+-- GUI principal
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PainelAdmin"
+screenGui.ResetOnSpawn = false
+
+-- Fundo do painel
+local frame = Instance.new("Frame")
+frame.Name = "Fundo"
+frame.Size = UDim2.new(0.4, 0, 0.5, 0)
+frame.Position = UDim2.new(0.3, 0, 0.25, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0.1
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
+
+local stroke = Instance.new("UIStroke", frame)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(0, 140, 255)
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Título
+local titulo = Instance.new("TextLabel")
+titulo.Parent = frame
+titulo.Size = UDim2.new(1, 0, 0.15, 0)
+titulo.BackgroundTransparency = 1
+titulo.Text = "🛠 Painel de Administração"
+titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+titulo.TextScaled = true
+titulo.Font = Enum.Font.GothamBold
+
+-- Linha divisória
+local linha = Instance.new("Frame")
+linha.Size = UDim2.new(0.9, 0, 0, 2)
+linha.Position = UDim2.new(0.05, 0, 0.15, 0)
+linha.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+linha.BorderSizePixel = 0
+linha.Parent = frame
+
+-- Botão de fechar
+local botaoFechar = Instance.new("TextButton")
+botaoFechar.Parent = frame
+botaoFechar.Size = UDim2.new(0.25, 0, 0.1, 0)
+botaoFechar.Position = UDim2.new(0.7, 0, 0.85, 0)
+botaoFechar.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+botaoFechar.Text = "Fechar"
+botaoFechar.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoFechar.Font = Enum.Font.GothamBold
+botaoFechar.TextScaled = true
+Instance.new("UICorner", botaoFechar).CornerRadius = UDim.new(0, 8)
+
+botaoFechar.MouseButton1Click:Connect(function()
+	frame.Visible = not frame.Visible
+end)
+
+UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.LeftControl then
+		frame.Visible = not frame.Visible
+	end
+end)
+
+-- ====== FUNÇÕES ====== --
+local infiniteJumpEnabled = false
+local speedBoostEnabled = false
+local flyEnabled = false
+
+local normalSpeed = 16
+local boostedSpeed = 100
+local flySpeed = 60
+
+-- ====== PULO INFINITO ====== --
+UIS.JumpRequest:Connect(function()
+	if infiniteJumpEnabled then
+		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
+end)
+
+-- ====== BOTÃO DE PULO ====== --
+local botaoPulo = Instance.new("TextButton")
+botaoPulo.Parent = frame
+botaoPulo.Size = UDim2.new(0.4, 0, 0.1, 0)
+botaoPulo.Position = UDim2.new(0.05, 0, 0.3, 0)
+botaoPulo.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+botaoPulo.Text = "Pulo Infinito: OFF"
+botaoPulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoPulo.Font = Enum.Font.GothamSemibold
+botaoPulo.TextScaled = true
+Instance.new("UICorner", botaoPulo).CornerRadius = UDim.new(0, 8)
+
+botaoPulo.MouseButton1Click:Connect(function()
+	infiniteJumpEnabled = not infiniteJumpEnabled
+	if infiniteJumpEnabled then
+		botaoPulo.Text = "Pulo Infinito: ON"
+		botaoPulo.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
+	else
+		botaoPulo.Text = "Pulo Infinito: OFF"
+		botaoPulo.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+	end
+end)
+
+-- ====== BOTÃO DE VELOCIDADE ====== --
+local botaoVel = Instance.new("TextButton")
+botaoVel.Parent = frame
+botaoVel.Size = UDim2.new(0.4, 0, 0.1, 0)
+botaoVel.Position = UDim2.new(0.55, 0, 0.3, 0)
+botaoVel.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+botaoVel.Text = "Velocidade: OFF"
+botaoVel.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoVel.Font = Enum.Font.GothamSemibold
+botaoVel.TextScaled = true
+Instance.new("UICorner", botaoVel).CornerRadius = UDim.new(0, 8)
+
+botaoVel.MouseButton1Click:Connect(function()
+	speedBoostEnabled = not speedBoostEnabled
+	if speedBoostEnabled then
+		humanoid.WalkSpeed = boostedSpeed
+		botaoVel.Text = "Velocidade: ON"
+		botaoVel.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
+	else
+		humanoid.WalkSpeed = normalSpeed
+		botaoVel.Text = "Velocidade: OFF"
+		botaoVel.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+	end
+end)
+
+-- ====== BOTÃO DE VOO ====== --
+local botaoFly = Instance.new("TextButton")
+botaoFly.Parent = frame
+botaoFly.Size = UDim2.new(0.9, 0, 0.1, 0)
+botaoFly.Position = UDim2.new(0.05, 0, 0.5, 0)
+botaoFly.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+botaoFly.Text = "Voo: OFF"
+botaoFly.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoFly.Font = Enum.Font.GothamSemibold
+botaoFly.TextScaled = true
+Instance.new("UICorner", botaoFly).CornerRadius = UDim.new(0, 8)
+
+-- Sistema de voo controlável
+local flying = false
+local flyDirection = Vector3.new(0, 0, 0)
+local flyBodyVelocity, flyBodyGyro
+
+local function startFlying()
+	if flying then return end
+	flying = true
+	character:WaitForChild("Humanoid").PlatformStand = true
+
+	flyBodyVelocity = Instance.new("BodyVelocity")
+	flyBodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+	flyBodyVelocity.Velocity = Vector3.zero
+	flyBodyVelocity.Parent = rootPart
+
+	flyBodyGyro = Instance.new("BodyGyro")
+	flyBodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+	flyBodyGyro.CFrame = rootPart.CFrame
+	flyBodyGyro.Parent = rootPart
+
+	RS.RenderStepped:Connect(function()
+		if flying then
+			flyBodyGyro.CFrame = workspace.CurrentCamera.CFrame
+			flyBodyVelocity.Velocity = flyDirection * flySpeed
+		end
+	end)
+end
+
+local function stopFlying()
+	flying = false
+	character:WaitForChild("Humanoid").PlatformStand = false
+	if flyBodyVelocity then flyBodyVelocity:Destroy() end
+	if flyBodyGyro then flyBodyGyro:Destroy() end
+end
+
+UIS.InputBegan:Connect(function(input)
+	if flying then
+		if input.KeyCode == Enum.KeyCode.W then
+			flyDirection = workspace.CurrentCamera.CFrame.LookVector
+		elseif input.KeyCode == Enum.KeyCode.S then
+			flyDirection = -workspace.CurrentCamera.CFrame.LookVector
+		elseif input.KeyCode == Enum.KeyCode.A then
+			flyDirection = -workspace.CurrentCamera.CFrame.RightVector
+		elseif input.KeyCode == Enum.KeyCode.D then
+			flyDirection = workspace.CurrentCamera.CFrame.RightVector
+		elseif input.KeyCode == Enum.KeyCode.Space then
+			flyDirection = Vector3.new(0, 1, 0)
+		elseif input.KeyCode == Enum.KeyCode.LeftShift then
+			flyDirection = Vector3.new(0, -1, 0)
+		end
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if flying then
+		flyDirection = Vector3.new(0, 0, 0)
+	end
+end)
+
+botaoFly.MouseButton1Click:Connect(function()
+	flyEnabled = not flyEnabled
+	if flyEnabled then
+		botaoFly.Text = "Voo: ON"
+		botaoFly.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
+		startFlying()
+	else
+		botaoFly.Text = "Voo: OFF"
+		botaoFly.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+		stopFlying()
+	end
+end)
+
+-- Finaliza
+screenGui.Parent = playerGui
