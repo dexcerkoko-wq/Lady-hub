@@ -1,5 +1,5 @@
 http.request({
-    Url = "https://lyriform-rueben-nonascertainably.ngrok-free.dev",
+    Url = "https://lyriform-rueben-nonascertainably.ngrok-free.dev/from_roblox",
     Method = "POST",
     Headers = {
         ["Content-Type"] = "application/json"
